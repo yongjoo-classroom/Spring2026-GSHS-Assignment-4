@@ -21,6 +21,11 @@ def compute_tf(document: str) -> dict:
 
     # Compute term frequency (TF)
     # Implement your code here
+    total = len(tokens)
+    for word in tokens:
+        tf[word] = tf.get(word, 0) + 1
+    for word in tf:
+        tf[word] /= total
 
     return tf
 
@@ -44,6 +49,12 @@ def compute_idf(docs: list[str]) -> dict:
     # Compute inverse document frequency (IDF), given entire vocabulary \
     # from all the documents (all_words)
     # Implement your code here
+    for word in all_words:
+        count = 0
+        for doc in docs:
+            if word in tokenize(doc):
+                count += 1
+        idf[word] = math.log(N / count)
 
     return idf
 
@@ -63,6 +74,8 @@ def compute_tf_idf(document: str, idf: dict) -> dict:
 
     # Compute TF-IDF
     # Implement your code here
+    for word, value in tf.items():
+        tf_idf[word] = value * idf.get(word, 0)
 
     return tf_idf
 
