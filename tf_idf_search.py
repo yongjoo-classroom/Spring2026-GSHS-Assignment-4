@@ -83,7 +83,8 @@ def compute_tf_idf(document: str, idf: dict) -> dict:
 
     # Compute TF-IDF
     # Implement your code here
-
+    for word, tf_val in tf.items():
+        tf_idf[word] = tf_val * idf.get(word, 0)
     return tf_idf
 
 
