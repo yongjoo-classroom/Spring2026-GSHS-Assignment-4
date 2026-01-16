@@ -23,5 +23,13 @@ jobs:
             echo "No requirements.txt found, skipping dependency install"
           fi
 
+      - name: Show files (debug)
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 3 -type f -name "test_*.py" -print
+          find . -maxdepth 3 -type f -name "tf_idf_search.py" -print
+
       - name: Run tests
-        run: pytest
+        run: |
+          python -m pytest -q
