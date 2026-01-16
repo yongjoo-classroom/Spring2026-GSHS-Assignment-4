@@ -21,3 +21,4 @@
           echo "Running pytest on:"
           echo "$TEST_FILES"
           python -m pytest -q $TEST_FILES
+
