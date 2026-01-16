@@ -1,24 +1,27 @@
-      - name: Run tests (robust)
+name: Validate TF-IDF-Based Search
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
         run: |
-          echo "PWD:"
-          pwd
-          echo "Repo tree (top):"
-          ls -la
-
-          echo "Tracked test files:"
-          git ls-files "test_*.py" || true
-
-          TEST_FILES=$(git ls-files "test_*.py")
-          if [ -z "$TEST_FILES" ]; then
-            echo "ERROR: No tracked test_*.py files found."
-            echo "All python files tracked:"
-            git ls-files "*.py" || true
-            echo "Find python files (maxdepth 4):"
-            find . -maxdepth 4 -type f -name "*.py" -print || true
-            exit 1
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            echo "No requirements.txt found, skipping dependency install"
           fi
 
-          echo "Running pytest on:"
-          echo "$TEST_FILES"
-          python -m pytest -q $TEST_FILES
-
+      - name: Run tests
+        run: pytest
