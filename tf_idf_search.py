@@ -52,6 +52,7 @@ def compute_idf(docs: list[str]) -> dict:
         df = 0
         for doc in docs:
             if word in tokenize(doc): df+=1
+                
         idf[word] = math.log(N / df)
 
     return idf
