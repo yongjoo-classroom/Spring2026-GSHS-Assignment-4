@@ -1,70 +1,27 @@
-import math
+from tf_idf_search import tf_idf_search
 
-def tokenize(text: str) -> list[str]:
-    return text.lower().split()
+documents = [
+    "cats are small animals",
+    "dogs are loyal animals",
+    "cats and dogs can be pets",
+    "cars and bikes are vehicles",
+    "trucks and cars move goods"
+]
 
-def compute_tf(document: str) -> dict:
-    tokens = tokenize(document)
-    n = len(tokens)
-    if n == 0:
-        return {}
-    counts = {}
-    for t in tokens:
-        counts[t] = counts.get(t, 0) + 1
-    tf = {}
-    for w, c in counts.items():
-        tf[w] = c / n
-    return tf
+def test_tf_idf_search_1():
+    '''
+    Test search function with query: Are cats pets?
+    '''
+    query = "Are cats pets"
+    expected_doc = "cats and dogs can be pets"
+    pred_doc = tf_idf_search(query, documents)
+    assert pred_doc == expected_doc, f"Expected: {expected_doc}, but got: {pred_doc}"
 
-def compute_idf(docs: list[str]) -> dict:
-    N = len(docs)
-    if N == 0:
-        return {}
-    all_words = set()
-    tokenized_docs = []
-    for doc in docs:
-        toks = tokenize(doc)
-        tokenized_docs.append(toks)
-        all_words.update(toks)
-
-    idf = {}
-    for w in all_words:
-        df = 0
-        for toks in tokenized_docs:
-            if w in set(toks):
-                df += 1
-        idf[w] = math.log(N / df) if df > 0 else 0.0
-    return idf
-
-def compute_tf_idf(document: str, idf: dict) -> dict:
-    tf = compute_tf(document)
-    tf_idf = {}
-    for w, tfv in tf.items():
-        if w in idf:
-            tf_idf[w] = tfv * idf[w]
-    return tf_idf
-
-def cosine_similarity(vec1: dict, vec2: dict) -> float:
-    dot = 0.0
-    for word, v1 in vec1.items():
-        dot += v1 * vec2.get(word, 0.0)
-
-    mag1 = math.sqrt(sum(v * v for v in vec1.values()))
-    mag2 = math.sqrt(sum(v * v for v in vec2.values()))
-
-    if mag1 == 0.0 or mag2 == 0.0:
-        return 0.0
-    return dot / (mag1 * mag2)
-
-def tf_idf_search(query: str, documents: list[str]) -> str:
-    idf = compute_idf(documents)
-    query_vec = compute_tf_idf(query, idf)
-    scores = []
-
-    for doc in documents:
-        doc_vec = compute_tf_idf(doc, idf)
-        score = cosine_similarity(query_vec, doc_vec)
-        scores.append((doc, score))
-
-    scores.sort(key=lambda x: x[1], reverse=True)
-    return scores[0][0]
+def test_tf_idf_search_2():
+    '''
+    Test search function with a query: Are cars vehicles?
+    '''
+    query = "Are cars vehicles"
+    expected_doc = "cars and bikes are vehicles"
+    pred_doc = tf_idf_search(query, documents)
+    assert pred_doc == expected_doc, f"Expected: {expected_doc}, but got: {pred_doc}"
