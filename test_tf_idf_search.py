@@ -1,85 +1,58 @@
-from __future__ import annotations
-
+# tf_idf_search.py
 import math
-from typing import Dict, List
 
-
-def tokenize(text: str) -> List[str]:
+def tokenize(text: str) -> list[str]:
     return text.lower().split()
 
-
-def compute_tf(document: str) -> Dict[str, float]:
+def compute_tf(document: str) -> dict:
     tokens = tokenize(document)
-    total_tokens = len(tokens)
-    if total_tokens == 0:
+    n = len(tokens)
+    if n == 0:
         return {}
-
-    counts: Dict[str, int] = {}
-    for token in tokens:
-        counts[token] = counts.get(token, 0) + 1
-
-    tf: Dict[str, float] = {}
-    for word, count in counts.items():
-        tf[word] = count / total_tokens
+    counts = {}
+    for t in tokens:
+        counts[t] = counts.get(t, 0) + 1
+    tf = {}
+    for w, c in counts.items():
+        tf[w] = c / n
     return tf
 
-
-def compute_idf(docs: List[str]) -> Dict[str, float]:
-    num_docs = len(docs)
-    if num_docs == 0:
+def compute_idf(docs: list[str]) -> dict:
+    N = len(docs)
+    if N == 0:
         return {}
-
-    doc_freq: Dict[str, int] = {}
+    all_words = set()
     for doc in docs:
-        seen_in_doc = set(tokenize(doc))
-        for token in seen_in_doc:
-            doc_freq[token] = doc_freq.get(token, 0) + 1
-
-    idf: Dict[str, float] = {}
-    for token, df in doc_freq.items():
-        idf[token] = math.log(num_docs / df)
+        all_words.update(tokenize(doc))
+    idf = {}
+    for w in all_words:
+        df = 0
+        for doc in docs:
+            if w in set(tokenize(doc)):
+                df += 1
+        idf[w] = math.log(N / df) if df > 0 else 0.0
     return idf
 
-
-def compute_tf_idf(document: str, idf: Dict[str, float]) -> Dict[str, float]:
-    tf_idf: Dict[str, float] = {}
+def compute_tf_idf(document: str, idf: dict) -> dict:
     tf = compute_tf(document)
-    for token, tf_value in tf.items():
-        idf_value = idf.get(token)
-        if idf_value is not None:
-            tf_idf[token] = tf_value * idf_value
+    tf_idf = {}
+    for w, tfv in tf.items():
+        if w in idf:
+            tf_idf[w] = tfv * idf[w]
     return tf_idf
 
-
-def cosine_similarity(vec1: Dict[str, float], vec2: Dict[str, float]) -> float:
-    if len(vec1) > len(vec2):
-        vec1, vec2 = vec2, vec1
-
-    dot = 0.0
-    for word, v1 in vec1.items():
-        dot += v1 * vec2.get(word, 0.0)
+def cosine_similarity(vec1: dict, vec2: dict) -> float:
+    dot = 0
+    for word in vec1:
+        dot += vec1[word] * vec2.get(word, 0)
 
     mag1 = math.sqrt(sum(v * v for v in vec1.values()))
     mag2 = math.sqrt(sum(v * v for v in vec2.values()))
-    if mag1 == 0.0 or mag2 == 0.0:
-        return 0.0
+
+    if mag1 == 0 or mag2 == 0:
+        return 0
+
     return dot / (mag1 * mag2)
 
-
-def tf_idf_search(query: str, documents: List[str]) -> str:
-    if not documents:
-        raise ValueError("documents list must not be empty")
-
-    idf = compute_idf(documents)
-    query_vec = compute_tf_idf(query, idf)
-
-    best_doc = documents[0]
-    best_score = -1.0
-    for doc in documents:
-        doc_vec = compute_tf_idf(doc, idf)
-        score = cosine_similarity(query_vec, doc_vec)
-        if score > best_score:
-            best_score = score
-            best_doc = doc
-    return best_doc
-    
+def tf_idf_search(query: str, documents: list[str]) -> str:
+    idf = compute_idf(do_
