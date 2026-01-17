@@ -85,6 +85,7 @@ def cosine_similarity(vec1: dict, vec2: dict) -> float:
     '''
     Compute the cosine similarity between two vectors.
     Parameters:
+    
         - vec1: The first vector (dictionary).
         - vec2: The second vector (dictionary).
 
