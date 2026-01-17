@@ -20,7 +20,15 @@ def compute_tf(document: str) -> dict:
     tokens = tokenize(document)
 
     # Compute term frequency (TF)
-    # Implement your code here
+    total_tokens = len(tokens)
+    if total_tokens == 0:
+        return tf
+    
+    for token in tokens:
+        tf[token] = tf.get(token, 0) + 1
+    
+    for word in tf:
+        tf[word] /= total_tokens
 
     return tf
 
@@ -43,7 +51,12 @@ def compute_idf(docs: list[str]) -> dict:
 
     # Compute inverse document frequency (IDF), given entire vocabulary \
     # from all the documents (all_words)
-    # Implement your code here
+    for word in all_words:
+        doc_count = 0
+        for doc in docs:
+            if word in tokenize(doc):
+                doc_count += 1
+        idf[word] = math.log(N / doc_count) if doc_count > 0 else 0
 
     return idf
 
@@ -62,7 +75,8 @@ def compute_tf_idf(document: str, idf: dict) -> dict:
     tf = compute_tf(document)
 
     # Compute TF-IDF
-    # Implement your code here
+    for word in tf:
+        tf_idf[word] = tf[word] * idf.get(word, 0)
 
     return tf_idf
 
@@ -71,6 +85,7 @@ def cosine_similarity(vec1: dict, vec2: dict) -> float:
     '''
     Compute the cosine similarity between two vectors.
     Parameters:
+    
         - vec1: The first vector (dictionary).
         - vec2: The second vector (dictionary).
 

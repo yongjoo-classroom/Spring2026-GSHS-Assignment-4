@@ -25,3 +25,4 @@ def test_tf_idf_search_2():
     expected_doc = "cars and bikes are vehicles"
     pred_doc = tf_idf_search(query, documents)
     assert pred_doc == expected_doc, f"Expected: {expected_doc}, but got: {pred_doc}"
+
