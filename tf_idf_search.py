@@ -18,9 +18,14 @@ def compute_tf(document: str) -> dict:
     '''
     tf = {}
     tokens = tokenize(document)
+    total = len(tokens)
 
     # Compute term frequency (TF)
     # Implement your code here
+    for w in tokens:
+        tf[w] = tf.get(w, 0) + 1
+    for w in tf:
+        tf[w] /= total
 
     return tf
 
@@ -31,7 +36,7 @@ def compute_idf(docs: list[str]) -> dict:
         - docs: A list of document strings.
 
     Returns:
-        - A dictionary representing the inverse document frequency (IDF) of each word.
+        - A dictionary representing the inverse document frequency (IDF) for each word.
           e.g, idf = {'cats': 1.0, 'are': 0.5, 'small': 0.5}
     '''
     idf = {}
@@ -44,6 +49,12 @@ def compute_idf(docs: list[str]) -> dict:
     # Compute inverse document frequency (IDF), given entire vocabulary \
     # from all the documents (all_words)
     # Implement your code here
+    for w in all_words:
+        cnt = 0
+        for doc in docs:
+            if w in tokenize(doc):
+                cnt += 1
+        idf[w] = math.log(N / cnt)
 
     return idf
 
@@ -63,9 +74,10 @@ def compute_tf_idf(document: str, idf: dict) -> dict:
 
     # Compute TF-IDF
     # Implement your code here
+    for w in tf:
+        tf_idf[w] = tf[w] * idf[w]
 
     return tf_idf
-
 
 def cosine_similarity(vec1: dict, vec2: dict) -> float:
     '''
@@ -111,5 +123,4 @@ def tf_idf_search(query: str, documents: list[str]) -> str:
 
     # Sort the documents by their score
     scores.sort(key=lambda x: x[1], reverse=True)
-    # print(scores)
     return scores[0][0]
