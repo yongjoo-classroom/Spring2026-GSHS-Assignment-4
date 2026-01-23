@@ -11,25 +11,26 @@ def compute_tf(document: str) -> dict:
     Given a document, compute the term frequency (TF) for each word.
     Parameters:
         - document: The input document string.
-
     Returns:
         - A dictionary representing the term frequency (TF) of each word in the document.
           e.g, tf = {'cats': 0.5, 'are': 0.25, 'small': 0.25}
     '''
     tf = {}
     tokens = tokenize(document)
-
-    # Compute term frequency (TF)
-    # Implement your code here
-
+    for token in tokens:
+        tf[token] = tf.get(token, 0) + 1
+    
+    total_tokens = len(tokens)
+    if total_tokens > 0:
+        for word in tf:
+            tf[word] = tf[word] / total_tokens
+    
     return tf
-
 def compute_idf(docs: list[str]) -> dict:
     '''
     Given a list of documents, compute the inverse document frequency (IDF) for each word.
     Parameters:
         - docs: A list of document strings.
-
     Returns:
         - A dictionary representing the inverse document frequency (IDF) of each word.
           e.g, idf = {'cats': 1.0, 'are': 0.5, 'small': 0.5}
@@ -37,14 +38,17 @@ def compute_idf(docs: list[str]) -> dict:
     idf = {}
     N = len(docs)
     all_words = set()
-
     for doc in docs:
         all_words.update(tokenize(doc))
-
-    # Compute inverse document frequency (IDF), given entire vocabulary \
-    # from all the documents (all_words)
-    # Implement your code here
-
+    
+    for word in all_words:
+        doc_count = 0
+        for doc in docs:
+            if word in tokenize(doc):
+                doc_count += 1
+        
+        idf[word] = math.log(N / doc_count)
+    
     return idf
 
 def compute_tf_idf(document: str, idf: dict) -> dict:
@@ -53,19 +57,17 @@ def compute_tf_idf(document: str, idf: dict) -> dict:
     Parameters:
         - document: The input document string.
         - idf: A dictionary representing the inverse document frequency (IDF) of all words.
-
     Returns:
         - A dictionary representing the TF-IDF of each word in the document.
           e.g, tf_idf = {'cats': 0.5, 'are': 0.25, 'small': 0.25}
     '''
     tf_idf = {}
     tf = compute_tf(document)
-
-    # Compute TF-IDF
-    # Implement your code here
-
+    
+    for word in tf:
+        tf_idf[word] = tf[word] * idf.get(word, 0)
+    
     return tf_idf
-
 
 def cosine_similarity(vec1: dict, vec2: dict) -> float:
     '''
